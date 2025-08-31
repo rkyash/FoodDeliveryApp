@@ -1,0 +1,2422 @@
+basePath: /api
+definitions:
+  handlers.AuthData:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/handlers.UserResponse'
+    type: object
+  handlers.AuthResponse:
+    properties:
+      data:
+        $ref: '#/definitions/handlers.AuthData'
+      error:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.ChangePasswordRequest:
+    properties:
+      currentPassword:
+        type: string
+      newPassword:
+        minLength: 6
+        type: string
+    required:
+    - currentPassword
+    - newPassword
+    type: object
+  handlers.CreateCategoryRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      order:
+        type: integer
+    required:
+    - name
+    type: object
+  handlers.CreateMenuItemRequest:
+    properties:
+      allergens:
+        type: string
+      calories:
+        type: integer
+      carbs:
+        type: number
+      categoryId:
+        type: string
+      description:
+        type: string
+      fat:
+        type: number
+      fiber:
+        type: number
+      image:
+        type: string
+      name:
+        type: string
+      preparationTime:
+        type: integer
+      price:
+        type: number
+      protein:
+        type: number
+      sodium:
+        type: number
+    required:
+    - categoryId
+    - name
+    - price
+    type: object
+  handlers.CreateOrderItemRequest:
+    properties:
+      customizationsData: {}
+      menuItemId:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      specialInstructions:
+        type: string
+    required:
+    - menuItemId
+    - quantity
+    type: object
+  handlers.CreateOrderRequest:
+    properties:
+      deliveryAddressId:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/handlers.CreateOrderItemRequest'
+        minItems: 1
+        type: array
+      paymentDetails: {}
+      paymentMethodType:
+        $ref: '#/definitions/models.PaymentMethodType'
+      restaurantId:
+        type: string
+      specialInstructions:
+        type: string
+      tip:
+        type: number
+    required:
+    - deliveryAddressId
+    - items
+    - paymentMethodType
+    - restaurantId
+    type: object
+  handlers.CreateRestaurantRequest:
+    properties:
+      address:
+        type: string
+      cuisineType:
+        type: string
+      deliveryFee:
+        type: number
+      description:
+        type: string
+      email:
+        type: string
+      image:
+        type: string
+      maxDeliveryTime:
+        type: integer
+      minDeliveryTime:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      priceRange:
+        maximum: 3
+        minimum: 1
+        type: integer
+    required:
+    - address
+    - cuisineType
+    - email
+    - name
+    - phone
+    - priceRange
+    type: object
+  handlers.CreateReviewRequest:
+    properties:
+      comment:
+        type: string
+      orderId:
+        type: string
+      photos:
+        items:
+          type: string
+        type: array
+      rating:
+        maximum: 5
+        minimum: 1
+        type: integer
+    required:
+    - comment
+    - orderId
+    - rating
+    type: object
+  handlers.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  handlers.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handlers.RefreshTokenRequest:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  handlers.RegisterRequest:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+    required:
+    - email
+    - firstName
+    - lastName
+    - password
+    - phone
+    type: object
+  handlers.ResetPasswordRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
+    type: object
+  handlers.UpdateOrderStatusRequest:
+    properties:
+      message:
+        type: string
+      status:
+        $ref: '#/definitions/models.OrderStatus'
+    required:
+    - status
+    type: object
+  handlers.UpdateRestaurantRequest:
+    properties:
+      address:
+        type: string
+      cuisineType:
+        type: string
+      deliveryFee:
+        type: number
+      description:
+        type: string
+      email:
+        type: string
+      image:
+        type: string
+      isOpen:
+        type: boolean
+      maxDeliveryTime:
+        type: integer
+      minDeliveryTime:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      priceRange:
+        type: integer
+    type: object
+  handlers.UpdateUserRoleRequest:
+    properties:
+      role:
+        enum:
+        - customer
+        - restaurant_owner
+        - admin
+        type: string
+    required:
+    - role
+    type: object
+  handlers.UpdateUserStatusRequest:
+    properties:
+      isActive:
+        type: boolean
+    type: object
+  handlers.UserResponse:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: string
+      lastName:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Address:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      isDefault:
+        type: boolean
+      latitude:
+        type: number
+      longitude:
+        type: number
+      state:
+        type: string
+      street:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      userId:
+        type: string
+      zipCode:
+        type: string
+    type: object
+  models.CustomizationOption:
+    properties:
+      createdAt:
+        type: string
+      customization:
+        allOf:
+        - $ref: '#/definitions/models.MenuCustomization'
+        description: Relationships
+      customizationId:
+        type: string
+      id:
+        type: string
+      isAvailable:
+        type: boolean
+      name:
+        type: string
+      priceModifier:
+        type: number
+      updatedAt:
+        type: string
+    type: object
+  models.CustomizationType:
+    enum:
+    - size
+    - addon
+    - choice
+    type: string
+    x-enum-varnames:
+    - SizeCustomization
+    - AddonCustomization
+    - ChoiceCustomization
+  models.ErrorResponse:
+    properties:
+      error:
+        example: Error message
+        type: string
+      message:
+        example: Error occurred
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  models.Favorite:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      restaurant:
+        $ref: '#/definitions/models.Restaurant'
+      restaurantId:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      userId:
+        type: string
+    type: object
+  models.MenuCategory:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      menuItems:
+        items:
+          $ref: '#/definitions/models.MenuItem'
+        type: array
+      name:
+        type: string
+      order:
+        type: integer
+      restaurant:
+        allOf:
+        - $ref: '#/definitions/models.Restaurant'
+        description: Relationships
+      restaurantId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.MenuCustomization:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      maxSelections:
+        type: integer
+      menuItem:
+        allOf:
+        - $ref: '#/definitions/models.MenuItem'
+        description: Relationships
+      menuItemId:
+        type: string
+      name:
+        type: string
+      options:
+        items:
+          $ref: '#/definitions/models.CustomizationOption'
+        type: array
+      required:
+        type: boolean
+      type:
+        $ref: '#/definitions/models.CustomizationType'
+      updatedAt:
+        type: string
+    type: object
+  models.MenuItem:
+    properties:
+      allergens:
+        type: string
+      calories:
+        type: integer
+      carbs:
+        type: number
+      category:
+        $ref: '#/definitions/models.MenuCategory'
+      categoryId:
+        type: string
+      createdAt:
+        type: string
+      customizations:
+        items:
+          $ref: '#/definitions/models.MenuCustomization'
+        type: array
+      description:
+        type: string
+      fat:
+        type: number
+      fiber:
+        type: number
+      id:
+        type: string
+      image:
+        type: string
+      isAvailable:
+        type: boolean
+      name:
+        type: string
+      preparationTime:
+        type: integer
+      price:
+        type: number
+      protein:
+        type: number
+      restaurant:
+        allOf:
+        - $ref: '#/definitions/models.Restaurant'
+        description: Relationships
+      restaurantId:
+        type: string
+      sodium:
+        type: number
+      updatedAt:
+        type: string
+    type: object
+  models.OpeningHours:
+    properties:
+      closeTime:
+        type: string
+      createdAt:
+        type: string
+      day:
+        type: string
+      id:
+        type: string
+      isClosed:
+        type: boolean
+      openTime:
+        type: string
+      restaurant:
+        allOf:
+        - $ref: '#/definitions/models.Restaurant'
+        description: Relationships
+      restaurantId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Order:
+    properties:
+      actualDeliveryTime:
+        type: string
+      createdAt:
+        type: string
+      deliveryAddress:
+        $ref: '#/definitions/models.Address'
+      deliveryAddressId:
+        type: string
+      deliveryFee:
+        type: number
+      estimatedDeliveryTime:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/models.OrderItem'
+        type: array
+      paymentDetails:
+        type: string
+      paymentMethodType:
+        $ref: '#/definitions/models.PaymentMethodType'
+      restaurant:
+        $ref: '#/definitions/models.Restaurant'
+      restaurantId:
+        type: string
+      specialInstructions:
+        type: string
+      status:
+        $ref: '#/definitions/models.OrderStatus'
+      tax:
+        type: number
+      tip:
+        type: number
+      totalAmount:
+        type: number
+      trackingUpdates:
+        items:
+          $ref: '#/definitions/models.TrackingUpdate'
+        type: array
+      updatedAt:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      userId:
+        type: string
+    type: object
+  models.OrderItem:
+    properties:
+      createdAt:
+        type: string
+      customizationsData:
+        type: string
+      id:
+        type: string
+      menuItem:
+        $ref: '#/definitions/models.MenuItem'
+      menuItemId:
+        type: string
+      name:
+        type: string
+      order:
+        allOf:
+        - $ref: '#/definitions/models.Order'
+        description: Relationships
+      orderId:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      specialInstructions:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.OrderResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Order'
+      message:
+        example: Order created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  models.OrderStatus:
+    enum:
+    - pending
+    - confirmed
+    - preparing
+    - ready_for_pickup
+    - picked_up
+    - on_the_way
+    - delivered
+    - cancelled
+    type: string
+    x-enum-varnames:
+    - PendingStatus
+    - ConfirmedStatus
+    - PreparingStatus
+    - ReadyForPickupStatus
+    - PickedUpStatus
+    - OnTheWayStatus
+    - DeliveredStatus
+    - CancelledStatus
+  models.OrdersResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Order'
+        type: array
+      message:
+        example: Orders retrieved successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  models.PaymentMethodType:
+    enum:
+    - credit_card
+    - debit_card
+    - digital_wallet
+    - cash
+    type: string
+    x-enum-varnames:
+    - CreditCardPayment
+    - DebitCardPayment
+    - DigitalWalletPayment
+    - CashPayment
+  models.Restaurant:
+    properties:
+      address:
+        type: string
+      categories:
+        items:
+          $ref: '#/definitions/models.MenuCategory'
+        type: array
+      createdAt:
+        type: string
+      cuisineType:
+        type: string
+      deliveryFee:
+        type: number
+      description:
+        type: string
+      email:
+        type: string
+      gallery:
+        items:
+          $ref: '#/definitions/models.RestaurantImage'
+        type: array
+      id:
+        type: string
+      image:
+        type: string
+      isActive:
+        type: boolean
+      isOpen:
+        type: boolean
+      maxDeliveryTime:
+        type: integer
+      menuItems:
+        items:
+          $ref: '#/definitions/models.MenuItem'
+        type: array
+      minDeliveryTime:
+        type: integer
+      name:
+        type: string
+      openingHours:
+        items:
+          $ref: '#/definitions/models.OpeningHours'
+        type: array
+      orders:
+        items:
+          $ref: '#/definitions/models.Order'
+        type: array
+      owner:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      ownerId:
+        type: string
+      phone:
+        type: string
+      priceRange:
+        type: integer
+      rating:
+        type: number
+      reviewCount:
+        type: integer
+      reviews:
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  models.RestaurantImage:
+    properties:
+      caption:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      imageUrl:
+        type: string
+      order:
+        type: integer
+      restaurant:
+        allOf:
+        - $ref: '#/definitions/models.Restaurant'
+        description: Relationships
+      restaurantId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Review:
+    properties:
+      comment:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      order:
+        $ref: '#/definitions/models.Order'
+      orderId:
+        type: string
+      photos:
+        items:
+          type: string
+        type: array
+      rating:
+        type: integer
+      response:
+        type: string
+      responseAt:
+        type: string
+      restaurant:
+        $ref: '#/definitions/models.Restaurant'
+      restaurantId:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      userId:
+        type: string
+    type: object
+  models.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        example: Operation completed successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  models.TrackingUpdate:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      message:
+        type: string
+      order:
+        allOf:
+        - $ref: '#/definitions/models.Order'
+        description: Relationships
+      orderId:
+        type: string
+      status:
+        $ref: '#/definitions/models.OrderStatus'
+    type: object
+  models.User:
+    properties:
+      addresses:
+        description: Relationships
+        items:
+          $ref: '#/definitions/models.Address'
+        type: array
+      createdAt:
+        type: string
+      email:
+        type: string
+      favorites:
+        items:
+          $ref: '#/definitions/models.Favorite'
+        type: array
+      firstName:
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      lastName:
+        type: string
+      orders:
+        items:
+          $ref: '#/definitions/models.Order'
+        type: array
+      phone:
+        type: string
+      restaurant:
+        $ref: '#/definitions/models.Restaurant'
+      reviews:
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
+      role:
+        $ref: '#/definitions/models.UserRole'
+      updatedAt:
+        type: string
+    type: object
+  models.UserRole:
+    enum:
+    - customer
+    - restaurant_owner
+    - admin
+    type: string
+    x-enum-varnames:
+    - CustomerRole
+    - RestaurantOwnerRole
+    - AdminRole
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: A comprehensive food delivery application API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Restaurant App API
+  version: "1.0"
+paths:
+  /admin/orders:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of all orders for admin monitoring
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by order status
+        in: query
+        name: status
+        type: string
+      - description: Filter by restaurant name
+        in: query
+        name: restaurant
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all orders with pagination
+      tags:
+      - admin
+  /admin/restaurants:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of all restaurants for admin management
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search by restaurant name
+        in: query
+        name: search
+        type: string
+      - description: Filter by status (active/inactive)
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all restaurants with pagination
+      tags:
+      - admin
+  /admin/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get comprehensive statistics for admin dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get admin dashboard statistics
+      tags:
+      - admin
+  /admin/users:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of all users for admin management
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search by email or name
+        in: query
+        name: search
+        type: string
+      - description: Filter by role
+        in: query
+        name: role
+        type: string
+      - description: Filter by status (active/inactive)
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all users with pagination
+      tags:
+      - admin
+  /admin/users/{userId}/role:
+    patch:
+      consumes:
+      - application/json
+      description: Change a user's role (customer, restaurant_owner, admin)
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Role update
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateUserRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update user role
+      tags:
+      - admin
+  /admin/users/{userId}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Activate or deactivate a user account
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Status update
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateUserStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update user active status
+      tags:
+      - admin
+  /auth/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Change current user password
+      parameters:
+      - description: Change password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Change user password
+      tags:
+      - auth
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Send password reset link to user email
+      parameters:
+      - description: Forgot password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Request password reset
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: User login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+      summary: Login user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout current user (blacklist token)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Logout user
+      tags:
+      - auth
+  /auth/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get current user profile information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get user profile
+      tags:
+      - auth
+    put:
+      consumes:
+      - application/json
+      description: Update current user profile information
+      parameters:
+      - description: Profile update data
+        in: body
+        name: profile
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update user profile
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh an expired JWT token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+      summary: Refresh JWT token
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account
+      parameters:
+      - description: User registration data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+      summary: Register a new user
+      tags:
+      - auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset user password using reset token
+      parameters:
+      - description: Reset password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Reset password with token
+      tags:
+      - auth
+  /menu-items/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific menu item
+      parameters:
+      - description: Menu Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get menu item details
+      tags:
+      - menu
+  /menu/categories:
+    post:
+      consumes:
+      - application/json
+      description: Create a new menu category for restaurant
+      parameters:
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create menu category
+      tags:
+      - menu
+  /menu/items:
+    post:
+      consumes:
+      - application/json
+      description: Create a new menu item for restaurant
+      parameters:
+      - description: Menu item data
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMenuItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create menu item
+      tags:
+      - menu
+  /menu/items/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a menu item
+      parameters:
+      - description: Menu Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete menu item
+      tags:
+      - menu
+    put:
+      consumes:
+      - application/json
+      description: Update menu item details
+      parameters:
+      - description: Menu Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Menu item update data
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMenuItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update menu item
+      tags:
+      - menu
+  /menu/items/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Toggle availability of a menu item
+      parameters:
+      - description: Menu Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Toggle menu item availability
+      tags:
+      - menu
+  /orders:
+    get:
+      description: Get all orders for the authenticated user
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrdersResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get user orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Create a new order with items
+      parameters:
+      - description: Order details
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new order
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      description: Get order details by ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get order by ID
+      tags:
+      - orders
+  /orders/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Update order status and add tracking update
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Status update
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update order status
+      tags:
+      - orders
+  /public/restaurants:
+    get:
+      consumes:
+      - application/json
+      description: Get all active restaurants with pagination and filtering
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by cuisine type
+        in: query
+        name: cuisine
+        type: string
+      - description: Search in restaurant names
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all restaurants
+      tags:
+      - restaurants
+  /public/restaurants/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single restaurant with its details
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get restaurant by ID
+      tags:
+      - restaurants
+  /public/restaurants/{id}/menu:
+    get:
+      consumes:
+      - application/json
+      description: Get complete menu with categories and items for a restaurant
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get restaurant menu
+      tags:
+      - menu
+  /restaurant/orders:
+    get:
+      description: Get all orders for restaurant owner's restaurant
+      parameters:
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.OrdersResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get restaurant orders
+      tags:
+      - orders
+  /restaurants:
+    post:
+      consumes:
+      - application/json
+      description: Create a new restaurant (restaurant owners only)
+      parameters:
+      - description: Restaurant data
+        in: body
+        name: restaurant
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateRestaurantRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new restaurant
+      tags:
+      - restaurants
+  /restaurants/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update restaurant details (owner only)
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Restaurant update data
+        in: body
+        name: restaurant
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateRestaurantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update restaurant
+      tags:
+      - restaurants
+  /restaurants/{restaurantId}/reviews:
+    get:
+      consumes:
+      - application/json
+      description: Get all reviews for a specific restaurant with pagination
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: restaurantId
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get reviews for a restaurant
+      tags:
+      - reviews
+    post:
+      consumes:
+      - application/json
+      description: Create a new review for a restaurant based on an order
+      parameters:
+      - description: Review data
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateReviewRequest'
+      - description: Restaurant ID
+        in: path
+        name: restaurantId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a review for a restaurant
+      tags:
+      - reviews
+  /restaurants/me:
+    get:
+      consumes:
+      - application/json
+      description: Get restaurant owned by current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get current user's restaurant
+      tags:
+      - restaurants
+  /restaurants/search:
+    get:
+      consumes:
+      - application/json
+      description: Search restaurants with various filters like cuisine, price range,
+        rating, etc.
+      parameters:
+      - description: Search query (name or cuisine)
+        in: query
+        name: q
+        type: string
+      - description: Cuisine type filter
+        in: query
+        name: cuisine
+        type: string
+      - description: Minimum rating (0-5)
+        in: query
+        name: minRating
+        type: number
+      - description: Maximum price range (1-4)
+        in: query
+        name: maxPrice
+        type: number
+      - description: Maximum delivery fee
+        in: query
+        name: deliveryFee
+        type: number
+      - description: Filter by open status
+        in: query
+        name: isOpen
+        type: boolean
+      - description: 'Sort by: rating, delivery_fee, delivery_time'
+        enum:
+        - rating
+        - delivery_fee
+        - delivery_time
+        in: query
+        name: sortBy
+        type: string
+      - description: 'Sort order: asc, desc'
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sortOrder
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Items per page (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search restaurants with advanced filters
+      tags:
+      - restaurants
+  /reviews/{reviewId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a review (author or admin only)
+      parameters:
+      - description: Review ID
+        in: path
+        name: reviewId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete a review
+      tags:
+      - reviews
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific review by ID
+      parameters:
+      - description: Review ID
+        in: path
+        name: reviewId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a specific review
+      tags:
+      - reviews
+    put:
+      consumes:
+      - application/json
+      description: Update a review (author only)
+      parameters:
+      - description: Review ID
+        in: path
+        name: reviewId
+        required: true
+        type: string
+      - description: Updated review data
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update a review
+      tags:
+      - reviews
+  /upload/image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an image for restaurant or menu item
+      parameters:
+      - description: Image file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Upload type
+        enum:
+        - restaurant
+        - menu
+        in: formData
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "413":
+          description: Request Entity Too Large
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Upload an image file
+      tags:
+      - upload
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
