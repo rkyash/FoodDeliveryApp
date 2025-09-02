@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const LoginPage: React.FC = () => {
@@ -12,7 +13,19 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   
   const { login } = useAuth();
+  const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Show success message from password reset
+  useEffect(() => {
+    const state = location.state as { message?: string } | null;
+    if (state?.message) {
+      showSuccess(state.message);
+      // Clear the state to prevent showing the message again
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, showSuccess, navigate, location.pathname]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,9 +34,12 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
+      showSuccess('Welcome back! You have been successfully logged in.');
       navigate('/'); // Redirect to homepage after successful login
     } catch (error: any) {
-      setError(error.message || 'Login failed. Please try again.');
+      const errorMessage = error.message || 'Login failed. Please try again.';
+      setError(errorMessage);
+      showError(errorMessage, 'Login Failed');
     } finally {
       setIsLoading(false);
     }

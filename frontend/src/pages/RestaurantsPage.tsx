@@ -10,6 +10,12 @@ const RestaurantsPage: React.FC = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    pages: 0
+  });
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
     query: searchParams.get('q') || '',
@@ -17,6 +23,8 @@ const RestaurantsPage: React.FC = () => {
     priceRange: [1, 3],
     rating: 0,
     deliveryTime: 60,
+    deliveryFee: 20,
+    isOpenOnly: false,
     sortBy: 'rating',
   });
 
@@ -34,7 +42,7 @@ const RestaurantsPage: React.FC = () => {
 
   useEffect(() => {
     fetchRestaurants();
-  }, [filters]);
+  }, [filters, pagination.page, pagination.limit]);
 
   const fetchRestaurants = async () => {
     try {
@@ -48,12 +56,28 @@ const RestaurantsPage: React.FC = () => {
       }
       if (filters.priceRange[1] < 4) queryParams.append('maxPrice', filters.priceRange[1].toString());
       if (filters.rating > 0) queryParams.append('minRating', filters.rating.toString());
-      queryParams.append('sortBy', filters.sortBy);
-      queryParams.append('limit', '20');
+      if (filters.deliveryFee < 50) queryParams.append('deliveryFee', filters.deliveryFee.toString());
+      if (filters.isOpenOnly) queryParams.append('isOpen', 'true');
+      
+      // Map frontend sortBy to backend field names
+      const sortByMapping: { [key: string]: string } = {
+        'rating': 'rating',
+        'deliveryTime': 'delivery_time', 
+        'deliveryFee': 'delivery_fee',
+        'distance': 'name' // fallback to name sorting
+      };
+      queryParams.append('sortBy', sortByMapping[filters.sortBy] || 'rating');
+      queryParams.append('limit', pagination.limit.toString());
+      queryParams.append('page', pagination.page.toString());
 
       const response = await api.get(`/public/restaurants/search?${queryParams.toString()}`);
       if (response.data.success) {
         setRestaurants(response.data.data?.restaurants || []);
+        setPagination(prev => ({
+          ...prev,
+          total: response.data.data?.pagination?.total || 0,
+          pages: response.data.data?.pagination?.pages || 0
+        }));
       }
     } catch (error) {
       setError(handleApiError(error));
@@ -92,6 +116,8 @@ const RestaurantsPage: React.FC = () => {
       priceRange: [1, 3],
       rating: 0,
       deliveryTime: 60,
+      deliveryFee: 20,
+      isOpenOnly: false,
       sortBy: 'rating',
     });
     setSearchParams({});
@@ -145,7 +171,7 @@ const RestaurantsPage: React.FC = () => {
           {/* Filters Panel */}
           {showFilters && (
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
                 {/* Cuisine Types */}
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Cuisine Type</h3>
@@ -212,6 +238,39 @@ const RestaurantsPage: React.FC = () => {
                   </select>
                 </div>
 
+                {/* Delivery Fee */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Max Delivery Fee</h3>
+                  <select
+                    value={filters.deliveryFee}
+                    onChange={(e) => setFilters(prev => ({ ...prev, deliveryFee: Number(e.target.value) }))}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
+                    <option value={50}>Any Fee</option>
+                    <option value={2.99}>$2.99</option>
+                    <option value={4.99}>$4.99</option>
+                    <option value={7.99}>$7.99</option>
+                    <option value={9.99}>$9.99</option>
+                  </select>
+                </div>
+
+                {/* Open Status */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Status</h3>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="openOnly"
+                      checked={filters.isOpenOnly}
+                      onChange={(e) => setFilters(prev => ({ ...prev, isOpenOnly: e.target.checked }))}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label htmlFor="openOnly" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      Open now only
+                    </label>
+                  </div>
+                </div>
+
                 {/* Sort By */}
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Sort By</h3>
@@ -245,11 +304,30 @@ const RestaurantsPage: React.FC = () => {
           )}
         </div>
 
-        {/* Results */}
-        <div className="mb-4">
+        {/* Results Summary */}
+        <div className="mb-4 flex justify-between items-center">
           <p className="text-gray-600 dark:text-gray-400">
-            {!isLoading && `${restaurants.length} restaurants found`}
+            {!isLoading && (
+              <>
+                Showing {(pagination.page - 1) * pagination.limit + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} restaurants
+              </>
+            )}
           </p>
+          
+          {/* Results per page selector */}
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-600 dark:text-gray-400">Per page:</span>
+            <select
+              value={pagination.limit}
+              onChange={(e) => setPagination(prev => ({ ...prev, limit: Number(e.target.value), page: 1 }))}
+              className="text-sm p-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              <option value={6}>6</option>
+              <option value={12}>12</option>
+              <option value={24}>24</option>
+              <option value={48}>48</option>
+            </select>
+          </div>
         </div>
 
         {/* Restaurant List */}
@@ -284,11 +362,62 @@ const RestaurantsPage: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {restaurants.map(restaurant => (
-              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {restaurants.map(restaurant => (
+                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              ))}
+            </div>
+            
+            {/* Pagination */}
+            {pagination.pages > 1 && (
+              <div className="flex justify-center items-center space-x-2">
+                <button
+                  onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                  disabled={pagination.page <= 1}
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  Previous
+                </button>
+                
+                {/* Page Numbers */}
+                {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                  let pageNum;
+                  if (pagination.pages <= 5) {
+                    pageNum = i + 1;
+                  } else if (pagination.page <= 3) {
+                    pageNum = i + 1;
+                  } else if (pagination.page >= pagination.pages - 2) {
+                    pageNum = pagination.pages - 4 + i;
+                  } else {
+                    pageNum = pagination.page - 2 + i;
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPagination(prev => ({ ...prev, page: pageNum }))}
+                      className={`px-3 py-2 text-sm font-medium rounded-lg ${
+                        pagination.page === pageNum
+                          ? 'text-blue-600 bg-blue-50 border border-blue-300 dark:bg-blue-900 dark:text-blue-400'
+                          : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                
+                <button
+                  onClick={() => setPagination(prev => ({ ...prev, page: Math.min(pagination.pages, prev.page + 1) }))}
+                  disabled={pagination.page >= pagination.pages}
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

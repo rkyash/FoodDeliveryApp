@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { api, handleApiError } from '../services/api';
+import { useToast } from '../context/ToastContext';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const ForgotPasswordPage: React.FC = () => {
@@ -9,6 +10,7 @@ const ForgotPasswordPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const { showSuccess, showError } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,8 +20,11 @@ const ForgotPasswordPage: React.FC = () => {
     try {
       await api.post('/auth/forgot-password', { email });
       setIsSuccess(true);
+      showSuccess(`Password reset link sent to ${email}`, 'Check Your Email');
     } catch (error: any) {
-      setError(handleApiError(error));
+      const errorMessage = handleApiError(error);
+      setError(errorMessage);
+      showError(errorMessage, 'Failed to Send Email');
     } finally {
       setIsLoading(false);
     }

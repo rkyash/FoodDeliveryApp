@@ -205,6 +205,8 @@ export interface SearchFilters {
   priceRange: number[];
   rating: number;
   deliveryTime: number;
+  deliveryFee: number;
+  isOpenOnly: boolean;
   sortBy: 'rating' | 'deliveryTime' | 'deliveryFee' | 'distance';
   location?: {
     lat: number;
