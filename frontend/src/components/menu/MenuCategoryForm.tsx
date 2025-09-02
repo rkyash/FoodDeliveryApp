@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
 import type { MenuCategory } from '../../types';
 
@@ -14,6 +14,7 @@ interface MenuCategoryFormProps {
   onSubmit: (data: MenuCategoryFormData) => void;
   editCategory?: MenuCategory | null;
   loading?: boolean;
+  error?: string;
 }
 
 const MenuCategoryForm: React.FC<MenuCategoryFormProps> = ({
@@ -21,7 +22,8 @@ const MenuCategoryForm: React.FC<MenuCategoryFormProps> = ({
   onClose,
   onSubmit,
   editCategory,
-  loading = false
+  loading = false,
+  error
 }) => {
   const [formData, setFormData] = useState<MenuCategoryFormData>({
     name: editCategory?.name || '',
@@ -29,7 +31,25 @@ const MenuCategoryForm: React.FC<MenuCategoryFormProps> = ({
     order: editCategory?.order || 1,
   });
 
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
+
+  // Update form data when editCategory changes
+  useEffect(() => {
+    if (editCategory) {
+      setFormData({
+        name: editCategory.name || '',
+        description: editCategory.description || '',
+        order: editCategory.order || 1,
+      });
+    } else {
+      setFormData({
+        name: '',
+        description: '',
+        order: 1,
+      });
+    }
+    setLocalError('');
+  }, [editCategory]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -43,16 +63,16 @@ const MenuCategoryForm: React.FC<MenuCategoryFormProps> = ({
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      setError('Category name is required');
+      setLocalError('Category name is required');
       return;
     }
 
     if (formData.order < 1) {
-      setError('Order must be at least 1');
+      setLocalError('Order must be at least 1');
       return;
     }
 
-    setError('');
+    setLocalError('');
     onSubmit(formData);
   };
 
@@ -76,6 +96,15 @@ const MenuCategoryForm: React.FC<MenuCategoryFormProps> = ({
               <X className="h-5 w-5" />
             </button>
           </div>
+
+          {/* Error Display */}
+          {(error || localError) && (
+            <div className="px-6 pt-4">
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-red-700 dark:text-red-400 text-sm">{error || localError}</p>
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -129,9 +158,9 @@ const MenuCategoryForm: React.FC<MenuCategoryFormProps> = ({
             </div>
 
             {/* Error Display */}
-            {error && (
+            {(error || localError) && (
               <div className="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <div className="text-red-600 dark:text-red-400">{error}</div>
+                <div className="text-red-600 dark:text-red-400">{error || localError}</div>
               </div>
             )}
 

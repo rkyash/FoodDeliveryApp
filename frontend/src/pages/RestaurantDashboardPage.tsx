@@ -115,7 +115,7 @@ const RestaurantSettingsForm: React.FC<RestaurantSettingsFormProps> = ({ restaur
     }
   };
 
-  const handleImageUpload = (imageUrl: string) => {
+  const handleImageUpload = (imageUrl: string, filename: string) => {
     setFormData(prev => ({
       ...prev,
       image: imageUrl
@@ -451,6 +451,7 @@ const RestaurantDashboardPage: React.FC = () => {
   const [editingCategory, setEditingCategory] = useState<MenuCategory | null>(null);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -552,15 +553,18 @@ const RestaurantDashboardPage: React.FC = () => {
 
   const handleCreateCategory = async (data: MenuCategoryFormData) => {
     setFormLoading(true);
+    setFormError('');
     try {
       const response = await api.post('/menu/categories', data);
       if (response.data.success) {
         setCategoryFormOpen(false);
         fetchMenu(); // Refresh menu
+      } else {
+        setFormError('Failed to create category');
       }
     } catch (error: any) {
       console.error('Error creating category:', error);
-      alert('Failed to create category');
+      setFormError(handleApiError(error));
     } finally {
       setFormLoading(false);
     }
@@ -592,10 +596,11 @@ const RestaurantDashboardPage: React.FC = () => {
 
   const handleCreateMenuItem = async (data: MenuItemFormData) => {
     setFormLoading(true);
+    setFormError('');
     try {
       const payload = {
         ...data,
-        allergens: data.allergens.split(',').map(a => a.trim()).filter(a => a),
+        allergens: data.allergens || '',
         calories: data.calories || undefined,
         protein: data.protein || undefined,
         carbs: data.carbs || undefined,
@@ -608,10 +613,12 @@ const RestaurantDashboardPage: React.FC = () => {
       if (response.data.success) {
         setItemFormOpen(false);
         fetchMenu(); // Refresh menu
+      } else {
+        setFormError('Failed to create menu item');
       }
     } catch (error: any) {
       console.error('Error creating menu item:', error);
-      alert('Failed to create menu item');
+      setFormError(handleApiError(error));
     } finally {
       setFormLoading(false);
     }
@@ -629,7 +636,7 @@ const RestaurantDashboardPage: React.FC = () => {
     try {
       const payload = {
         ...data,
-        allergens: data.allergens.split(',').map(a => a.trim()).filter(a => a),
+        allergens: data.allergens || '',
         calories: data.calories || undefined,
         protein: data.protein || undefined,
         carbs: data.carbs || undefined,
@@ -646,7 +653,7 @@ const RestaurantDashboardPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error updating menu item:', error);
-      alert('Failed to update menu item');
+      setFormError(handleApiError(error));
     } finally {
       setFormLoading(false);
     }
@@ -655,11 +662,13 @@ const RestaurantDashboardPage: React.FC = () => {
   const closeCategoryForm = () => {
     setCategoryFormOpen(false);
     setEditingCategory(null);
+    setFormError('');
   };
 
   const closeItemForm = () => {
     setItemFormOpen(false);
     setEditingItem(null);
+    setFormError('');
   };
 
   const handleTabChange = (tab: typeof activeTab) => {
@@ -1138,7 +1147,7 @@ const RestaurantDashboardPage: React.FC = () => {
                                     {formatCurrency(item.price)}
                                   </span>
                                   <button
-                                    onClick={() => toggleMenuItemAvailability(item.id, !item.isAvailable)}
+                                    onClick={() => toggleMenuItemAvailability(item.id)}
                                     className={`flex items-center text-sm ${
                                       item.isAvailable ? 'text-green-600' : 'text-red-600'
                                     }`}
@@ -1200,6 +1209,7 @@ const RestaurantDashboardPage: React.FC = () => {
         onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory}
         editCategory={editingCategory}
         loading={formLoading}
+        error={formError}
       />
 
       <MenuItemForm
@@ -1209,6 +1219,7 @@ const RestaurantDashboardPage: React.FC = () => {
         categories={menuCategories}
         editItem={editingItem}
         loading={formLoading}
+        error={formError}
       />
     </div>
   );

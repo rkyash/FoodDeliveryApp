@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, Star, Clock, MapPin, SlidersHorizontal } from 'lucide-react';
 import type { Restaurant, SearchFilters } from '../types';
-import { api, handleApiError } from '../services/api';
+import { api, handleApiError, getImageUrl } from '../services/api';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const RestaurantsPage: React.FC = () => {
@@ -300,7 +300,7 @@ const RestaurantCard: React.FC<{ restaurant: Restaurant }> = ({ restaurant }) =>
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
       <div className="relative">
         <img
-          src={restaurant.image || '/placeholder-restaurant.jpg'}
+          src={restaurant.image ? getImageUrl(restaurant.image) : '/placeholder-restaurant.jpg'}
           alt={restaurant.name}
           className="w-full h-48 object-cover"
           onError={(e) => {

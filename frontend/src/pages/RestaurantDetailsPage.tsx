@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { api, handleApiError } from '../services/api';
+import { api, handleApiError, getImageUrl } from '../services/api';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ReviewList from '../components/reviews/ReviewList';
 import type { Restaurant, MenuCategory, MenuItem } from '../types';
@@ -222,7 +222,7 @@ const RestaurantDetailsPage: React.FC = () => {
             <div className="w-full lg:w-80 h-60 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
               {restaurant.image ? (
                 <img 
-                  src={restaurant.image} 
+                  src={getImageUrl(restaurant.image)} 
                   alt={restaurant.name}
                   className="w-full h-full object-cover"
                 />
@@ -347,7 +347,7 @@ const RestaurantDetailsPage: React.FC = () => {
                       <div className="w-full sm:w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
                         {item.image ? (
                           <img 
-                            src={item.image} 
+                            src={getImageUrl(item.image)} 
                             alt={item.name}
                             className="w-full h-full object-cover"
                           />

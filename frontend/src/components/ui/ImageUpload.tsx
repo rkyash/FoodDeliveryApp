@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
-import { api } from '../../services/api';
+import { api, getImageUrl } from '../../services/api';
 
 interface ImageUploadProps {
   type: 'restaurant' | 'menu';
@@ -127,7 +127,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         <div className="relative group">
           <div className="relative w-full h-48 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
             <img
-              src={currentImage}
+              src={getImageUrl(currentImage)}
               alt="Uploaded image"
               className="w-full h-full object-cover"
             />

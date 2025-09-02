@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Star, Clock, Truck } from 'lucide-react';
 import type { Restaurant } from '../types';
-import { api, handleApiError } from '../services/api';
+import { api, handleApiError, getImageUrl } from '../services/api';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const HomePage: React.FC = () => {
@@ -213,7 +213,7 @@ const RestaurantCard: React.FC<{ restaurant: Restaurant }> = ({ restaurant }) =>
     >
       <div className="aspect-w-16 aspect-h-9">
         <img
-          src={restaurant.image || '/placeholder-restaurant.jpg'}
+          src={restaurant.image ? getImageUrl(restaurant.image) : '/placeholder-restaurant.jpg'}
           alt={restaurant.name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
           onError={(e) => {

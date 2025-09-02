@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { X, Image as ImageIcon, Plus, AlertCircle } from 'lucide-react';
-import { api } from '../../services/api';
+import { api, getImageUrl } from '../../services/api';
 
 interface MultiImageUploadProps {
   type: 'restaurant' | 'menu';
@@ -153,7 +153,7 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
           <div key={index} className="relative group aspect-square">
             <div className="relative w-full h-full bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
               <img
-                src={image}
+                src={getImageUrl(image)}
                 alt={`Image ${index + 1}`}
                 className="w-full h-full object-cover"
               />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
 import ImageUpload from '../ui/ImageUpload';
 import type { MenuCategory, MenuItem } from '../../types';
@@ -26,6 +26,7 @@ interface MenuItemFormProps {
   categories: MenuCategory[];
   editItem?: MenuItem | null;
   loading?: boolean;
+  error?: string;
 }
 
 const MenuItemForm: React.FC<MenuItemFormProps> = ({
@@ -34,7 +35,8 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({
   onSubmit,
   categories,
   editItem,
-  loading = false
+  loading = false,
+  error
 }) => {
   const [formData, setFormData] = useState<MenuItemFormData>({
     categoryId: editItem?.categoryId || '',
@@ -43,7 +45,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({
     price: editItem?.price || 0,
     image: editItem?.image || '',
     preparationTime: editItem?.preparationTime || 15,
-    allergens: editItem?.allergens?.join(', ') || '',
+    allergens: Array.isArray(editItem?.allergens) ? editItem.allergens.join(', ') : editItem?.allergens || '',
     calories: editItem?.nutritionInfo?.calories || undefined,
     protein: editItem?.nutritionInfo?.protein || undefined,
     carbs: editItem?.nutritionInfo?.carbs || undefined,
@@ -52,24 +54,62 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({
     sodium: editItem?.nutritionInfo?.sodium || undefined,
   });
 
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
+
+  // Update form data when editItem changes
+  useEffect(() => {
+    if (editItem) {
+      setFormData({
+        categoryId: editItem.categoryId || '',
+        name: editItem.name || '',
+        description: editItem.description || '',
+        price: editItem.price || 0,
+        image: editItem.image || '',
+        preparationTime: editItem.preparationTime || 15,
+        allergens: Array.isArray(editItem.allergens) ? editItem.allergens.join(', ') : editItem.allergens || '',
+        calories: editItem.nutritionInfo?.calories || undefined,
+        protein: editItem.nutritionInfo?.protein || undefined,
+        carbs: editItem.nutritionInfo?.carbs || undefined,
+        fat: editItem.nutritionInfo?.fat || undefined,
+        fiber: editItem.nutritionInfo?.fiber || undefined,
+        sodium: editItem.nutritionInfo?.sodium || undefined,
+      });
+    } else {
+      setFormData({
+        categoryId: '',
+        name: '',
+        description: '',
+        price: 0,
+        image: '',
+        preparationTime: 15,
+        allergens: '',
+        calories: undefined,
+        protein: undefined,
+        carbs: undefined,
+        fat: undefined,
+        fiber: undefined,
+        sodium: undefined,
+      });
+    }
+    setLocalError('');
+  }, [editItem]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'price' || name === 'preparationTime' || name.startsWith('nutrition') 
+      [name]: name === 'price' || name === 'preparationTime' || ['calories', 'protein', 'carbs', 'fat', 'fiber', 'sodium'].includes(name)
         ? parseFloat(value) || 0 
         : value
     }));
   };
 
-  const handleImageUpload = (imageUrl: string) => {
+  const handleImageUpload = (imageUrl: string, filename: string) => {
     setFormData(prev => ({
       ...prev,
       image: imageUrl
     }));
-    setError('');
+    setLocalError('');
   };
 
   const handleImageRemove = () => {
@@ -80,19 +120,19 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({
   };
 
   const handleUploadError = (error: string) => {
-    setError(error);
+    setLocalError(error);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name.trim() || !formData.description.trim() || !formData.categoryId) {
-      setError('Please fill in all required fields');
+      setLocalError('Please fill in all required fields');
       return;
     }
     
     if (formData.price <= 0) {
-      setError('Price must be greater than 0');
+      setLocalError('Price must be greater than 0');
       return;
     }
 
@@ -119,6 +159,15 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({
               <X className="h-5 w-5" />
             </button>
           </div>
+
+          {/* Error Display */}
+          {(error || localError) && (
+            <div className="px-6 pt-4">
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-red-700 dark:text-red-400 text-sm">{error || localError}</p>
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -342,9 +391,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({
             </div>
 
             {/* Error Display */}
-            {error && (
+            {(error || localError) && (
               <div className="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <div className="text-red-600 dark:text-red-400">{error}</div>
+                <div className="text-red-600 dark:text-red-400">{error || localError}</div>
               </div>
             )}
 

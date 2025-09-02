@@ -62,3 +62,18 @@ export const createApiResponse = <T>(
   message,
   error,
 });
+
+// Helper function to construct full image URLs
+export const getImageUrl = (imageUrl: string): string => {
+  if (!imageUrl) return '';
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl; // Already a full URL
+  }
+  // If the URL starts with /api/, construct the full URL
+  if (imageUrl.startsWith('/api/')) {
+    // Extract the base URL without the /api path
+    const baseUrl = API_BASE_URL.replace('/api', ''); 
+    return `${baseUrl}${imageUrl}`;
+  }
+  return imageUrl;
+};
